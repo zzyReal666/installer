@@ -20,22 +20,19 @@ function load_image_files() {
       continue
     fi
 
-    echo -n "${image} <= ${IMAGE_DIR}/${filename} "
-    md5_filename=$(basename "${image}").md5
-    md5_path=${IMAGE_DIR}/${md5_filename}
-    image_id=$(docker inspect -f "{{.ID}}" "${image}" 2&>/dev/null || echo "")
-    saved_id=""
-
-    if [[ -f "${md5_path}" ]]; then
-      saved_id=$(cat "${md5_path}")
+    # 检查镜像是否已存在
+    if docker image inspect "${image}" &>/dev/null; then
+      echo "✓ ${image} $(gettext 'already exists, skipping')"
+      continue
     fi
-    if [[ ${image_id} != "${saved_id}" ]]; then
-      echo
-      if ! docker load <"${IMAGE_DIR}/${filename}"; then
-        echo_red "$(gettext 'Error loading image'): ${filename}"
-      fi
+
+    echo "→ $(gettext 'Loading image'): ${image}"
+    echo "  $(gettext 'From file'): ${IMAGE_DIR}/${filename}"
+    
+    if ! docker load <"${IMAGE_DIR}/${filename}"; then
+      echo_red "✗ $(gettext 'Error loading image'): ${filename}"
     else
-      echo "$(gettext 'Docker image loaded, skipping')"
+      echo_green "✓ ${image} $(gettext 'loaded successfully')"
     fi
   done
 }
