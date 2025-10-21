@@ -73,8 +73,8 @@ USE_XPACK=${USE_XPACK:-0}
 
 # 基础镜像
 IMAGES=(
-    "redis:7.0-bullseye"
-    "mysql:8.0"
+    "redis:7-bookworm"
+    "postgres:16.3-bullseye"
 )
 
 # 企业版镜像
